@@ -1,0 +1,93 @@
+一、
+①阶段：线性动态规划的阶段数量一般和序列长度相关
+-按照枚举的下标划分阶段
+
+二、
+②指标函数：求谁设谁
+-设最长不下降子序列的长度为指标函数f
+
+③*
+-i 表示阶段
+f[i]表示枚举到第i个数时已知的最长不下降子序列的长度
+-j 表示已知的最长不下降子序列的最后一个元素在原序列中的下标
+f[i][j]表示枚举到第i个数时、以a[j]结尾的最长不下降子序列的长度
+
+③**
+-i 表示已知的最长不下降子序列的最后一个元素在原序列中的下标
+f[i]表示以a[i]结尾的最长不下降子序列的长度
+
+三、
+④决策：每个阶段可以采取的操作
+-将第i个数选入不下降子序列
+-不将第i个数选入不下降子序列
+
+四、
+⑤*
+-将第i个数选入不下降子序列
+f[i][i] = max{f[i - 1][k] | a[k] <= a[i], k < i}
+-不将第i个数选入不下降子序列
+f[i][k] = f[i - 1][k] | k < i
+
+⑤**
+-将第i个数选入不下降子序列
+f[i] = max{f[k] | a[k] <= a[i], k < i}
+-不将第i个数选入不下降子序列
+f[i] = f[i - 1]
+
+⑥*
+f[i][i] = max{f[i - 1][k] + 1 | a[k] <= a[i], k < i}
+f[i][k] = f[i - 1][k] | k < i
+
+⑥**
+f[i] = max{f[i - 1], f[k] + 1 | a[k] <= a[i], k < i}
+
+五、
+⑦*
+f[i][i] = 1
+f[i][k] = 0 | a[k] != a[i], k < i
+
+⑦**
+f[i] = 1
+
+六、
+⑧*
+ans = max{f[n][k] | 1 <= k <= n}
+
+⑧**
+ans = max{f[k] | 1 <= k <= n}
+
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+#define MAXN 5000 + 5
+using namespace std;
+
+int n, f[MAXN][MAXN], a[MAXN];
+
+int main()
+{
+	cin >> n;
+	for(int i = 1; i <= n; ++ i)
+		cin >> a[i];
+
+	memset(f, 0, sizeof(0));
+	for(int i = 1; i <= n; ++ i)
+		f[i][i] = 1;
+
+	for(int i = 1; i <= n; ++ i)
+	{
+		for(int k = 1; k < i; ++ k)
+		{
+			// f[i][i] = max{f[i - 1][k] | a[k] <= a[i], k < i}
+			if(a[k] <= a[i])
+				f[i][i] = max(f[i][i], f[i - 1][k] + 1);
+			// f[i][k] = f[i - 1][k] | k < i
+			f[i][k] = f[i - 1][k];
+		}
+	}
+
+	int ans = 0;
+	for(int i = 1; i <= n; ++ i)
+		ans = max(ans, f[n][i]);
+	cout << ans;
+}
